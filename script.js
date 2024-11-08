@@ -1,49 +1,28 @@
-const apiUrl = 'https://corsproxy.io/?' + encodeURIComponent("https://jacintodesign.github.io/quotes-api/data/quotes.json");
 const stoicQuoteUrl = 'https://corsproxy.io/?' + encodeURIComponent("https://stoic.tekloon.net/stoic-quote");
 const zenQuotesURL = 'https://corsproxy.io/?' + encodeURIComponent("https://zenquotes.io/api/random");
-let apiQuotes = [];
+let apiResponseQuotes = [];
 const quoteBtn = document.getElementById("quote-btn");
 const quoteContainer = document.getElementById("quote-container");
 const quoteText = document.getElementById("quote");
 const authorText = document.getElementById("author");
 const twitterBtn = document.getElementById("twitter");
+const loader = document.getElementById("loader");
 
-
-function newZenQuote(){
-    const quote = apiQuotes[Math.floor(Math.random() * apiQuotes.length)];
-    if(!quote.author){
-        authorText.textContent = "Unknown";
-    }
-
-    authorText.textContent = quote.a;
-
-    if(quote.q.length > 50){
-          quoteText.classList.add("long-quote");  
-    }else{
-        quoteText.classList.remove("long-quote");  
-    }
-    
-    quoteText.textContent = quote.q;
+//Display loading spinner
+function loading(){
+    loader.hidden = false;
+    quoteContainer.hidden = true;
 }
 
 
-function newStoicQuote() {
-  
+function hideLoading(){
+     quoteContainer.hidden = false;
+     loader.hidden = true;
 }
 
-
-async function getZenQuotes(){
-    try {
-        const response = await fetch(zenQuotesURL);
-        apiQuotes = await response.json();
-        newZenQuote();
-       
-    } catch {
-        //alert("Error is fetching quotes");
-    }
-}
-
+//Get a stoic quote
 async function getStoicQuotes() {
+    loading();
   try {
     const response = await fetch(stoicQuoteUrl);
     const json = await response.json();
@@ -65,13 +44,62 @@ async function getStoicQuotes() {
     }
 
     quoteText.textContent = quote;
+    hideLoading();
 
   } catch {
-    //alert("Error is fetching quotes");
+    alert("Error is fetching quotes");
   }
 }
 
 
-//quoteBtn.addEventListener("click", getZenQuotes);
+//Selects a random Zen quote form the json response array of quotes
+/*function selectZenQuote(){
+    loading();
+    const quote =
+      apiResponseQuotes[Math.floor(Math.random() * apiResponseQuotes.length)];
+    if(!quote.author){
+        authorText.textContent = "Unknown";
+    }
 
+    authorText.textContent = quote.a;
+
+    if(quote.q.length > 50){
+          quoteText.classList.add("long-quote");  
+    }else{
+        quoteText.classList.remove("long-quote");  
+    }
+    
+    quoteText.textContent = quote.q;
+    hideLoading();
+}
+
+//Get a Zen quote and assign response to an array
+async function getZenQuotes(){
+    loading();
+    try {
+        const response = await fetch(zenQuotesURL);
+        apiResponseQuotes = await response.json();
+        selectZenQuote();
+       
+    } catch {
+        alert("Error is fetching quotes");
+    }
+}
+*/
+
+
+//Tweet Quote
+function tweetQuote(){
+    const xUrl = `https://twitter.com/intent/tweet?text="${quoteText.textContent}" - ${authorText.textContent}`;
+    window.open(xUrl, '_blank');
+}
+
+
+//Hide loading spinner when first navigating to the page
+hideLoading();
+
+//Get quote button functionality
 quoteBtn.addEventListener("click", getStoicQuotes);
+
+//Tweet quote button functionality
+twitterBtn.addEventListener("click", tweetQuote);
