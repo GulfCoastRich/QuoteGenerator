@@ -1,3 +1,4 @@
+//URL variables are prefixed with proxy server to avoid cors issues
 const stoicQuoteUrl = 'https://corsproxy.io/?' + encodeURIComponent("https://stoic.tekloon.net/stoic-quote");
 const zenQuotesURL = 'https://corsproxy.io/?' + encodeURIComponent("https://zenquotes.io/api/random");
 let apiResponseQuotes = [];
@@ -9,27 +10,26 @@ const twitterBtn = document.getElementById("twitter");
 const loader = document.getElementById("loader");
 
 //Display loading spinner
-function loading(){
+function showLoadingSpinner(){
     loader.hidden = false;
     quoteContainer.hidden = true;
 }
 
-
-function hideLoading(){
+function hideLoadingSpinner(){
      quoteContainer.hidden = false;
      loader.hidden = true;
 }
 
 //Get a stoic quote
 async function getStoicQuotes() {
-    loading();
+    showLoadingSpinner();
   try {
     const response = await fetch(stoicQuoteUrl);
     const json = await response.json();
     const author = json.data.author;
     const quote = json.data.quote;
-    console.log("Author = " + author);
-    console.log("Quote = " + quote);
+    console.log(`Author: ${author}`);
+    console.log(`Quote: "${quote}"`);
 
     if (!author) {
       authorText.textContent = "Unknown";
@@ -44,17 +44,17 @@ async function getStoicQuotes() {
     }
 
     quoteText.textContent = quote;
-    hideLoading();
+    hideLoadingSpinner();
 
-  } catch {
-    alert("Error is fetching quotes");
+  } catch (error){
+    console.log(error);
   }
 }
 
-
+/*
 //Selects a random Zen quote form the json response array of quotes
-/*function selectZenQuote(){
-    loading();
+function selectZenQuote(){
+    showLoadingSpinner();
     const quote =
       apiResponseQuotes[Math.floor(Math.random() * apiResponseQuotes.length)];
     if(!quote.author){
@@ -70,23 +70,25 @@ async function getStoicQuotes() {
     }
     
     quoteText.textContent = quote.q;
-    hideLoading();
+    console.log(`Quote: "${quote.q}"`);
+    console.log(`Author: ${quote.a}`);
+    hideLoadingSpinner();
 }
 
 //Get a Zen quote and assign response to an array
 async function getZenQuotes(){
-    loading();
+    showLoadingSpinner();
     try {
         const response = await fetch(zenQuotesURL);
         apiResponseQuotes = await response.json();
         selectZenQuote();
        
-    } catch {
-        alert("Error is fetching quotes");
+    } catch(error){
+        console.log(error);
     }
 }
-*/
 
+*/
 
 //Tweet Quote
 function tweetQuote(){
@@ -96,10 +98,11 @@ function tweetQuote(){
 
 
 //Hide loading spinner when first navigating to the page
-hideLoading();
+hideLoadingSpinner();
 
 //Get quote button functionality
 quoteBtn.addEventListener("click", getStoicQuotes);
+//quoteBtn.addEventListener("click", getZenQuotes);
 
 //Tweet quote button functionality
 twitterBtn.addEventListener("click", tweetQuote);
